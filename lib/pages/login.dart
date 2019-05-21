@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -6,9 +8,36 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  _login() async {
+    try {
+      FirebaseUser _user = await _firebaseAuth.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim());
+
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Login successful."),
+        ),
+      );
+    } catch (ex) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text((ex as PlatformException).message),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: Colors.deepOrange,
       body: Form(
         child: ListView(
@@ -50,6 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      controller: _emailController,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -92,6 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Expanded(
                     child: TextFormField(
+                      controller: _passwordController,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -117,7 +148,9 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _login();
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
