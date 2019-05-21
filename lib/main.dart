@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feedly/pages/login.dart';
+import 'package:flutter_feedly/pages/signup.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
-      home: LoginPage(),
+      home: SignupPage(),
     );
   }
 }
