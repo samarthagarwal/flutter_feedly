@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -12,6 +14,39 @@ class _SignupPageState extends State<SignupPage> {
   TextEditingController _passwordConfirmController = TextEditingController();
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
+  _signup() async {
+    if (_passwordController.text.trim() !=
+        _passwordConfirmController.text.trim()) {
+      _scaffoldKey.currentState
+          .showSnackBar(SnackBar(content: Text("Passwords do not match")));
+      return;
+    }
+
+    try {
+      FirebaseUser user = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim());
+
+      UserUpdateInfo info = UserUpdateInfo();
+      info.displayName = _nameController.text.trim();
+
+      await user.updateProfile(info);
+
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text("Your account has been created successfully."),
+        ),
+      );
+    } catch (ex) {
+      _scaffoldKey.currentState.showSnackBar(
+        SnackBar(
+          content: Text((ex as PlatformException).message),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -187,7 +222,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   Expanded(
                     child: TextFormField(
-                      controller: _passwordController,
+                      controller: _passwordConfirmController,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -213,7 +248,9 @@ class _SignupPageState extends State<SignupPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _signup();
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
