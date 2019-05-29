@@ -281,7 +281,9 @@ class _SignupPageState extends State<SignupPage> {
                 children: <Widget>[
                   Expanded(
                     child: FlatButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
