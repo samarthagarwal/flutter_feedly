@@ -16,6 +16,8 @@ class _SignupPageState extends State<SignupPage> {
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  bool _loggingIn = false;
+
   _signup() async {
     if (_passwordController.text.trim() !=
         _passwordConfirmController.text.trim()) {
@@ -23,6 +25,17 @@ class _SignupPageState extends State<SignupPage> {
           .showSnackBar(SnackBar(content: Text("Passwords do not match")));
       return;
     }
+
+    setState(() {
+      _loggingIn = true;
+    });
+
+    _scaffoldKey.currentState.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text("Creating your account..."),
+      ),
+    );
 
     try {
       FirebaseUser user = await _firebaseAuth.createUserWithEmailAndPassword(
@@ -34,17 +47,23 @@ class _SignupPageState extends State<SignupPage> {
 
       await user.updateProfile(info);
 
+      _scaffoldKey.currentState.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text("Your account has been created successfully."),
         ),
       );
     } catch (ex) {
+      _scaffoldKey.currentState.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text((ex as PlatformException).message),
         ),
       );
+    } finally {
+      setState(() {
+        _loggingIn = false;
+      });
     }
   }
 
@@ -180,6 +199,7 @@ class _SignupPageState extends State<SignupPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _passwordController,
+                      obscureText: true,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -223,6 +243,7 @@ class _SignupPageState extends State<SignupPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _passwordConfirmController,
+                      obscureText: true,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -245,12 +266,15 @@ class _SignupPageState extends State<SignupPage> {
                     child: FlatButton(
                       splashColor: Colors.white,
                       color: Colors.white,
+                      disabledColor: Colors.white.withOpacity(0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      onPressed: () {
-                        _signup();
-                      },
+                      onPressed: _loggingIn == true
+                          ? null
+                          : () {
+                              _signup();
+                            },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[

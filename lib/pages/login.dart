@@ -15,23 +15,42 @@ class _LoginPageState extends State<LoginPage> {
 
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  bool _loggingIn = false;
+
   _login() async {
+    setState(() {
+      _loggingIn = true;
+    });
+
+    _scaffoldKey.currentState.removeCurrentSnackBar();
+    _scaffoldKey.currentState.showSnackBar(
+      SnackBar(
+        content: Text("Logging you in..."),
+      ),
+    );
+
     try {
       FirebaseUser _user = await _firebaseAuth.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim());
 
+      _scaffoldKey.currentState.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text("Login successful."),
         ),
       );
     } catch (ex) {
+      _scaffoldKey.currentState.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
         SnackBar(
           content: Text((ex as PlatformException).message),
         ),
       );
+    } finally {
+      setState(() {
+        _loggingIn = false;
+      });
     }
   }
 
@@ -124,6 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _passwordController,
+                      obscureText: true,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         border: InputBorder.none,
@@ -146,12 +166,15 @@ class _LoginPageState extends State<LoginPage> {
                     child: FlatButton(
                       splashColor: Colors.white,
                       color: Colors.white,
+                      disabledColor: Colors.white.withOpacity(0.5),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30.0),
                       ),
-                      onPressed: () {
-                        _login();
-                      },
+                      onPressed: _loggingIn == true
+                          ? null
+                          : () {
+                              _login();
+                            },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
