@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_feedly/pages/feed.dart';
 import 'package:flutter_feedly/pages/signup.dart';
 
 class LoginPage extends StatefulWidget {
@@ -40,6 +41,10 @@ class _LoginPageState extends State<LoginPage> {
           content: Text("Login successful."),
         ),
       );
+
+      Navigator.push(context, MaterialPageRoute(builder: (ctx) {
+        return FeedPage();
+      }));
     } catch (ex) {
       _scaffoldKey.currentState.removeCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(
