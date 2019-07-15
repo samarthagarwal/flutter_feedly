@@ -49,6 +49,36 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
+  _showModalBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext ctx) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                leading: Icon(Icons.camera_alt),
+                title: Text("Camera"),
+                onTap: () {
+                  // ToDO: Use image_picker plugin
+
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text("Photo Album"),
+                onTap: () {
+                  // ToDO: Use image_picker plugin
+
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -100,7 +130,9 @@ class _CreatePageState extends State<CreatePage> {
                       ),
                       splashColor: Colors.deepOrange,
                       color: Colors.deepOrange,
-                      onPressed: () {},
+                      onPressed: () {
+                        _showModalBottomSheet();
+                      },
                       child: Row(
                         children: <Widget>[
                           Padding(
