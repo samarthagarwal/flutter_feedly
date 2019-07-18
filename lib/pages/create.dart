@@ -216,7 +216,41 @@ class _CreatePageState extends State<CreatePage> {
                   ),
                 ),
               ],
-            )
+            ),
+            _image == null
+                ? Container()
+                : Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(
+                          children: <Widget>[
+                            Container(
+                              child: Image.file(
+                                _image,
+                                fit: BoxFit.cover,
+                              ),
+                              width: 150,
+                              height: 150,
+                            ),
+                            Positioned(
+                              top: 4.0,
+                              right: 4.0,
+                              child: IconButton(
+                                  icon: Icon(Icons.close),
+                                  color: Colors.white,
+                                  onPressed: () {
+                                    setState(() {
+                                      _image = null;
+                                    });
+                                  }),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
           ],
         ),
       ),
