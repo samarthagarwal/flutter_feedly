@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_feedly/pages/create.dart';
 import 'package:flutter_feedly/widgets/compose_box.dart';
@@ -8,10 +10,32 @@ class FeedPage extends StatefulWidget {
 }
 
 class _FeedPageState extends State<FeedPage> {
+  List<Widget> _posts = [];
+  List<DocumentSnapshot> _postDocuments = [];
+  Future _getFeedFuture;
+
+  Firestore _firestore = Firestore.instance;
+  FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+
   _navigateToCreatePage() {
     Navigator.push(context, MaterialPageRoute(builder: (BuildContext ctx) {
       return CreatePage();
     }));
+  }
+
+  Future _getFeed() async {
+    Query _query = _firestore
+        .collection("posts")
+        .orderBy("created", descending: true)
+        .limit(10);
+
+    QuerySnapshot _querySnapshot = await _query.getDocuments();
+
+    print(_querySnapshot.documents.length);
+
+    _postDocuments = _querySnapshot.documents;
+
+    return _postDocuments;
   }
 
   _getItems() {
@@ -25,6 +49,13 @@ class _FeedPageState extends State<FeedPage> {
     _items.add(_composeBox);
 
     return _items;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    _getFeed();
   }
 
   @override
