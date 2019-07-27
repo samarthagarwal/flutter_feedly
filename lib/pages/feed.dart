@@ -42,10 +42,7 @@ class _FeedPageState extends State<FeedPage> {
     _postDocuments = _querySnapshot.documents;
 
     for (int i = 0; i < _postDocuments.length; ++i) {
-      Widget w = ListTile(
-        title: Text(_postDocuments[i].data["text"]),
-        subtitle: Text(_postDocuments[i].data["owner_name"]),
-      );
+      Widget w = _makeCard(_postDocuments[i]);
 
       _posts.add(w);
     }
@@ -76,7 +73,7 @@ class _FeedPageState extends State<FeedPage> {
     _items.add(separator);
 
     Widget feed = FutureBuilder(
-        future: _getFeedFuture,
+        future: _getFeed(),
         builder: (BuildContext ctx, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.data == null) {
@@ -133,6 +130,91 @@ class _FeedPageState extends State<FeedPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreatePage,
         child: Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _makeCard(DocumentSnapshot postDocument) {
+    return Card(
+      margin: const EdgeInsets.all(8.0),
+      elevation: 5.0,
+      child: Column(
+        children: <Widget>[
+          ListTile(
+            title: Text(postDocument.data["owner_name"]),
+            subtitle: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Icon(
+                  Icons.watch_later,
+                  size: 14.0,
+                ),
+                SizedBox(
+                  width: 4.0,
+                ),
+                Text(
+                  (postDocument.data["created"] as Timestamp)
+                      .toDate()
+                      .toIso8601String(),
+                ),
+              ],
+            ),
+          ),
+          postDocument.data["image"] == null
+              ? Container()
+              : Image.network(
+                  postDocument.data["image"],
+                  fit: BoxFit.cover,
+                  width: MediaQuery.of(context).size.width,
+                ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(postDocument.data["text"]),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {},
+                  child: Text(
+                    "4 Likes",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {},
+                  child: Text(
+                    "2 Comments",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: FlatButton(
+                  onPressed: () {},
+                  child: Text(
+                    "Share",
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          )
+        ],
       ),
     );
   }
