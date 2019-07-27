@@ -73,7 +73,7 @@ class _FeedPageState extends State<FeedPage> {
     _items.add(separator);
 
     Widget feed = FutureBuilder(
-        future: _getFeedFuture,
+        future: _getFeed(),
         builder: (BuildContext ctx, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting ||
               snapshot.data == null) {
@@ -168,13 +168,22 @@ class _FeedPageState extends State<FeedPage> {
                   width: MediaQuery.of(context).size.width,
                 ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(postDocument.data["text"]),
+              ),
+            ],
+          ),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Expanded(
                 child: FlatButton(
                   onPressed: () {},
                   child: Text(
-                    "3 Likes",
+                    "4 Likes",
                     style: TextStyle(
                       fontSize: 12.0,
                     ),
