@@ -20,6 +20,9 @@ class _FeedPageState extends State<FeedPage> {
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   ScrollController _scrollController = ScrollController();
+  bool _loadingMorePosts = false;
+  bool _canLoadMorePosts = true;
+  DocumentSnapshot _lastDocument;
 
   _navigateToCreatePage() async {
     await Navigator.push(context,
@@ -44,6 +47,7 @@ class _FeedPageState extends State<FeedPage> {
     print(_querySnapshot.documents.length);
 
     _postDocuments = _querySnapshot.documents;
+    _lastDocument = _postDocuments[_postDocuments.length - 1];
 
     for (int i = 0; i < _postDocuments.length; ++i) {
       Widget w = _makeCard(_postDocuments[i]);
@@ -55,7 +59,42 @@ class _FeedPageState extends State<FeedPage> {
   }
 
   Future _getMoreFeed() async {
-    print("Loading more data");
+    if (_loadingMorePosts == true) {
+      print("Already loading more posts...");
+      return null;
+    }
+
+    if (_canLoadMorePosts == false) {
+      print("No more posts to load...");
+      return null;
+    }
+
+    _loadingMorePosts = true;
+
+    Query query = _firestore
+        .collection("posts")
+        .orderBy("created", descending: true)
+        .limit(10)
+        .startAfter([_lastDocument.data['created']]);
+    QuerySnapshot postDocuments = await query.getDocuments();
+
+    if (postDocuments.documents.length < 10) {
+      print("Loaded all posts..");
+      _canLoadMorePosts = false;
+    }
+
+    _postDocuments.addAll(postDocuments.documents);
+    _lastDocument = _postDocuments[_postDocuments.length - 1];
+
+    for (int i = 0; i < postDocuments.documents.length; ++i) {
+      Card card = _makeCard(postDocuments.documents[i]);
+      _posts.add(card);
+    }
+
+    setState(() {
+      _loadingMorePosts = false;
+    });
+    return _postDocuments;
   }
 
   _getItems() {
