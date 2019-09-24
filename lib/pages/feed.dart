@@ -19,6 +19,8 @@ class _FeedPageState extends State<FeedPage> {
   Firestore _firestore = Firestore.instance;
   FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
+  ScrollController _scrollController = ScrollController();
+
   _navigateToCreatePage() async {
     await Navigator.push(context,
         MaterialPageRoute(builder: (BuildContext ctx) {
@@ -50,6 +52,10 @@ class _FeedPageState extends State<FeedPage> {
     }
 
     return _postDocuments;
+  }
+
+  Future _getMoreFeed() async {
+    print("Loading more data");
   }
 
   _getItems() {
@@ -110,6 +116,17 @@ class _FeedPageState extends State<FeedPage> {
   void initState() {
     super.initState();
 
+    _scrollController.addListener(() {
+      double maxScroll = _scrollController.position.maxScrollExtent;
+      double currentScroll = _scrollController.position.pixels;
+      double delta = MediaQuery.of(context).size.height * 0.25;
+
+      if (maxScroll - currentScroll <= delta) {
+        // load more posts
+        _getMoreFeed();
+      }
+    });
+
     _getFeedFuture = _getFeed();
   }
 
@@ -127,6 +144,7 @@ class _FeedPageState extends State<FeedPage> {
         ],
       ),
       body: ListView(
+        controller: _scrollController,
         children: _getItems(),
       ),
       floatingActionButton: FloatingActionButton(
